@@ -1,0 +1,22 @@
+<footer id="footer" class="mdui-text-center mdui-m-t-5 mdui-p-b-2 mdui-p-t-4 mdui-color-theme">
+  <div class="mdui-container">
+    <div class="mdui-row">
+      <span>
+        &copy; <% if (theme.footer.since) { %><%= theme.footer.since %> - <% } %><%- date(new Date(), 'YYYY') %> 
+        <%if(theme.footer.icon.enabled){%>
+          <span style="color: #d9333f" class="iconfont <%=theme.footer.icon.name%>"></span>
+        <%}%>
+        <%= config.author || config.title %>
+      </span>
+    </div>
+    <div class="mdui-row">
+      <%if(theme.footer.powered && theme.footer.theme){%>
+        <div class="mdui-col-xs-12">
+          <span>Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a></span>
+        </div>
+      <%}else if(theme.footer.powered){%>
+      <%}else{%>
+      <%}%>
+    </div>
+ </div>
+</footer>
