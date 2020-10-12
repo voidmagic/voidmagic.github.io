@@ -5,14 +5,14 @@
       <span class="iconfont icon-calendar"></span>
       <%=__('post.posted')%>:&nbsp;<%=date(postpage.date)%>
     </span>
-    <span>
+    <!-- <span>
       <span class="iconfont icon-calendar-check"></span>
       <%=__('post.edited')%>:&nbsp;<%=date(postpage.updated)%>
     </span>
     <span>
       <span class="iconfont icon-folder"></span>
       <%=__('post.in')%>:&nbsp;<%- list_categories(postpage.categories, {show_count: false, style: 'none', separator: ' > '}) %>
-    </span>
+    </span> -->
     <%if(busuanzi && theme.busuanzi.site){%>
       <span>
         <span class="iconfont icon-eye"></span>

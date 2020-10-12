@@ -48,7 +48,6 @@ mermaid:
 menu:
   home: / || icon-home
   tags: /tags/ || icon-bookmark
-  categories: /categories/ || icon-folder
   about: /about/ || icon-user
   #gallery: /categories/图集/ || icon-gallery
 
