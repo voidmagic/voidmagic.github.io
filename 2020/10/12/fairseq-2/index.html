@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <script>if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMode)) window.location.href="https://support.dmeng.net/upgrade-your-browser.html?referrer="+encodeURIComponent(window.location.href); </script>
+    
+    
+        <link rel="preload" crossorigin="crossorigin" href="/fonts/roboto/Roboto-Regular.woff2" as="font">
+        <link rel="preload" crossorigin="crossorigin" href="/fonts/roboto/Roboto-Bold.woff2" as="font">
+    
+    
+    
+        <link rel="shortcut icon" href="/icons/favicon.ico">
+    
+
+    
+    
+        
+<link rel="stylesheet" href="/css/mdui.min.v1.0.0.css">
+
+    
+    
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/iconfont.css">
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+          
+
+
+    
+    
+    <title>
+        
+            Fairseq漫游指南（2）——扩展模型 | Qian Wang
+        
+    </title>
+    
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
+<body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-teal mdui-theme-accent-blue">
+  
+  <header class="mdui-appbar mdui-appbar-fixed">
+  <div id="toolbar" class="mdui-toolbar mdui-color-theme">
+    <button class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="iconfont icon-menu"></i></button>
+    <a href="/" class="mdui-typo-headline">Qian Wang</a>
+    <a href="/" class="header-subtitle mdui-typo-headline"></a>
+    <div class="mdui-toolbar-spacer"></div>
+  </div>
+</header>
+
+  <aside id="sidebar" class="mdui-drawer">
+    
+    
+    <div id="sidebar-tab2" class="mdui-p-a-2">
+        <div class="sidebar-overview">
+            <div class="sidebar-avatar">
+                
+                    <img src="/icons/avatar.gif"/>
+                
+            </div>
+            <div class="sidebar-author-name">Qian Wang</div>
+            <div class="sidebar-description"></div>
+        </div>
+    </div>
+
+
+    
+    <div id="sidebar-tab1" class="mdui-p-a-2">
+        <div class="mdui-list">
+            
+                
+                <a href="/" class="mdui-list-item mdui-ripple">
+                    <div class="mdui-list-item-icon">
+                        <i class="iconfont icon-home"></i>
+                    </div>
+                    <div class="mdui-list-item-content">主页</div>
+                </a>
+            
+                
+                <a href="/tags/" class="mdui-list-item mdui-ripple">
+                    <div class="mdui-list-item-icon">
+                        <i class="iconfont icon-bookmark"></i>
+                    </div>
+                    <div class="mdui-list-item-content">标签</div>
+                </a>
+            
+                
+                <a href="/categories/" class="mdui-list-item mdui-ripple">
+                    <div class="mdui-list-item-icon">
+                        <i class="iconfont icon-folder"></i>
+                    </div>
+                    <div class="mdui-list-item-content">分类</div>
+                </a>
+            
+                
+                <a href="/about/" class="mdui-list-item mdui-ripple">
+                    <div class="mdui-list-item-icon">
+                        <i class="iconfont icon-user"></i>
+                    </div>
+                    <div class="mdui-list-item-content">关于</div>
+                </a>
+            
+            <div class="mdui-list-item mdui-ripple">
+                <div class="mdui-list-item-icon">
+                    <i class="iconfont icon-moon"></i>
+                </div>
+                <div class="mdui-list-item-content">夜间模式</div>
+                <label class="mdui-switch" id="darkmode">
+                  <input type="checkbox" id="nightmode_switch"/>
+                  <i class="mdui-switch-icon"></i>
+                </label>
+            </div>           
+        </div>
+        
+        <div class="sidebar-links">
+            
+                
+                <div class="mdui-chip">
+                    <span class="mdui-chip-icon"><i class="iconfont icon-mail"></i></span>
+                    <a href="mailto:qian.wang@nlpr.ia.ac.cn" class="mdui-chip-title">E-Mail</a>
+                </div>
+            
+                
+                <div class="mdui-chip">
+                    <span class="mdui-chip-icon"><i class="iconfont icon-github"></i></span>
+                    <a target="_blank" rel="noopener" href="https://github.com/voidmagic" class="mdui-chip-title">GitHub</a>
+                </div>
+            
+        </div>
+    </div>
+
+</aside>
+  
+  <main id="main-contain" class="mdui-container mdui-m-t-5">
+    <article id="article" class="mdui-card mdui-p-b-2 mdui-m-b-5">
+  <header class="mdui-card-media">
+    
+    
+      <div class="post-header"> 
+  <a class="post-header-title" href="/2020/10/12/fairseq-2/">Fairseq漫游指南（2）——扩展模型</a>
+  <div class="post-header-meta">
+    <span>
+      <span class="iconfont icon-calendar"></span>
+      发布于:&nbsp;2020-10-12
+    </span>
+    <span>
+      <span class="iconfont icon-calendar-check"></span>
+      更新于:&nbsp;2020-10-12
+    </span>
+    <span>
+      <span class="iconfont icon-folder"></span>
+      分类于:&nbsp;
+    </span>
+    
+  </div>
+</div>   
+    
+
+
+
+    
+    
+    <!-- <div class="mdui-card-menu">
+    
+      <button class="mdui-btn mdui-btn-icon mdui-text-color-teal" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="iconfont icon-share"></i></button>
+      <ul class="mdui-menu" id="share_menu">
+        <li class="mdui-menu-item">
+          <a href="http://service.weibo.com/share/share.php?appkey=&title=Fairseq漫游指南（2）——扩展模型&url=http://example.com/2020/10/12/fairseq-2/&pic=http://example.com/null&searchPic=false&style=simple" target="_blank" class="mdui-ripple">分享到 Weibo</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="https://twitter.com/intent/tweet?text=Fairseq漫游指南（2）——扩展模型&url=http://example.com/2020/10/12/fairseq-2/&via=Qian Wang" target="_blank" class="mdui-ripple">分享到 Twitter</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2020/10/12/fairseq-2/" target="_blank" class="mdui-ripple">分享到 Facebook</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="https://plus.google.com/share?url=http://example.com/2020/10/12/fairseq-2/" target="_blank" class="mdui-ripple">分享到 Google+</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=http://example.com/2020/10/12/fairseq-2/&title=Fairseq漫游指南（2）——扩展模型" target="_blank" class="mdui-ripple">分享到 LinkedIn</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="http://connect.qq.com/widget/shareqq/index.html?site=Qian Wang&title=Fairseq漫游指南（2）——扩展模型&summary=&pics=http://example.com/null&url=http://example.com/2020/10/12/fairseq-2/" target="_blank" class="mdui-ripple">分享到 QQ</a>
+        </li>
+        <li class="mdui-menu-item">
+          <a href="https://telegram.me/share/url?url=http://example.com/2020/10/12/fairseq-2/&text=Fairseq漫游指南（2）——扩展模型" target="_blank" class="mdui-ripple">分享到 Telegram</a>
+        </li>
+      </ul>
+    
+  </div> -->
+  </header>
+  
+  
+  
+  <div class="mdui-card-content mdui-typo mdui-p-x-4">
+    <p>本文为Fairseq漫游指南系列的第二篇文章。前面一篇文章以基于Transformer的翻译模型为例，对Fairseq的命令行使用方法进行了初步的介绍。Fairseq预设了大量的任务和模型，可以根据需要准备数据，并参考对应任务、模型的参数进行训练和解码。</p>
+<p>在实际的使用中，现有的模型可能无法满足真实任务的需要，我们可能需要处理不同类型的输入输出，或者需要对模型进行修改以验证新的想法。在这种情况下，只通过命令行调用预设任务和模型的方法就存在很大的局限，我们需要对Fairseq本身进行扩展，以满足实际多样化的需求。</p>
+<p>本文以实现一个可以双向翻译（EN-DE和DE-EN）的Transformer模型为例，来介绍Fairseq扩展的使用方法。</p>
+<h2 id="Fairseq扩展概述"><a href="#Fairseq扩展概述" class="headerlink" title="Fairseq扩展概述"></a>Fairseq扩展概述</h2><p>Fairseq允许用户在不修改源代码的情况下，以插件的形式进行扩展。目前，可以自定义五种插件：<br>    1. 任务（Tasks）：任务定义了我们要完成的整个流程，包括读取数据组成batch、模型初始化、训练、测试等。<br>    2. 模型（Models）：模型定义了网络的结构、包含的参数、前向计算过程。<br>    3. 评价准则（Criterions）：评价准则也就是损失函数，用来根据网络输出和真实标签计算损失。<br>    4. 优化器（Optimizers）：在反向传播之后，优化器决定了更新模型参数的方式。<br>    5. 学习率调度器（Learning Rate Schedulers）：学习率调度器可以用来根据训练过的步数，动态调整学习率。</p>
+<p>对于这五种插件，Fairseq自身的代码中提供了大量的预设，可以在对应的目录下查看，如<code>fairseq/models</code>目录下提供了多种模型的实现。在指定了这五种插件（可以为预设值，也可以为用户编写的插件）之后，fairseq的训练流程可以抽象为：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> range(num_epochs):</span><br><span class="line">    itr = task.get<span class="constructor">_batch_iterator(<span class="params">task</span>.<span class="params">dataset</span>(&#x27;<span class="params">train</span>&#x27;)</span>)</span><br><span class="line">    <span class="keyword">for</span> num_updates, batch <span class="keyword">in</span> enumerate(itr):</span><br><span class="line">        task.train<span class="constructor">_step(<span class="params">batch</span>, <span class="params">model</span>, <span class="params">criterion</span>, <span class="params">optimizer</span>)</span></span><br><span class="line">        average<span class="constructor">_and_clip_gradients()</span></span><br><span class="line">        optimizer.step<span class="literal">()</span></span><br><span class="line">        lr_scheduler.step<span class="constructor">_update(<span class="params">num_updates</span>)</span></span><br><span class="line">    lr_scheduler.step(epoch)</span><br></pre></td></tr></table></figure>
+
+<p>如前所述，模型的单步训练过程在任务中定义，即<code>task.train_step</code>。默认情况下，其实现如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def train<span class="constructor">_step(<span class="params">self</span>, <span class="params">batch</span>, <span class="params">model</span>, <span class="params">criterion</span>, <span class="params">optimizer</span>, <span class="operator">**</span><span class="params">unused</span>)</span>:</span><br><span class="line">    loss = criterion(model, batch)</span><br><span class="line">    optimizer.backward(loss)</span><br><span class="line">    return loss</span><br></pre></td></tr></table></figure>
+
+<p>只通过命令行的方式，可以选择使用不同的预设插件，如LSTM、Transformer等不同的模型。但如果我们想要扩展Fairseq没有提供的一些功能，那么就需要我们自己编写一些插件，并进行注册，以便Fairseq在运行的时候可以加载我们自定义的插件。接下来我们以一个最简单的例子，来实现自己的Transformer模型。</p>
+<p>首先需要建立我们的代码仓库，假设代码存放在<code>$HOME/codebase/custom</code>：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">├── custom</span><br><span class="line">    └── <span class="module-access"><span class="module"><span class="identifier">__init__</span>.</span></span>py</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>__init__.py</code>的内容如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> fairseq.models.transformer <span class="keyword">import</span> TransformerModel, transformer_iwslt_de_en</span><br><span class="line"><span class="keyword">from</span> fairseq.models <span class="keyword">import</span> register_model, register_model_architecture</span><br><span class="line"></span><br><span class="line">@register_model(<span class="string">&#x27;my_transformer&#x27;</span>)</span><br><span class="line"><span class="keyword">class</span> <span class="symbol">MyTransformer</span>(<span class="symbol">TransformerModel</span>):</span><br><span class="line">    <span class="symbol">pass</span></span><br><span class="line"></span><br><span class="line">@<span class="symbol">register_model_architecture</span>(&#x27;<span class="symbol">my_transformer</span>&#x27;, &#x27;<span class="symbol">iwslt_arch</span>&#x27;)</span><br><span class="line"><span class="symbol">def</span> <span class="symbol">my_transformer_iwslt</span>(<span class="symbol">args</span>):</span><br><span class="line">    <span class="symbol">transformer_iwslt_de_en</span>(<span class="symbol">args</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在Fairseq中，模型称为<code>model</code>，模型对应的超参数称为<code>model_architecture</code>。在这个例子中，我们定义了一个名为<code>my_transformer</code>的模型，以及其对应的<code>iwslt_arch</code>超参数。由于模型直接继承了预设的<code>TransformerModel</code>，超参数直接调用了<code>transformer_iwslt_de_en</code>，因此其功能没有任何的改变，只是名字发生了改变。在编写了这个简单的插件后，就可以通过命令行来进行调用了：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">fairseq</span><span class="literal">-</span><span class="comment">train</span> <span class="comment">data</span><span class="literal">-</span><span class="comment">bin</span> --<span class="comment">arch</span> <span class="comment">iwslt_arch</span> --<span class="comment">user</span><span class="literal">-</span><span class="comment">dir</span> <span class="comment">$HOME/codebase/custom</span> --<span class="comment">max</span><span class="literal">-</span><span class="comment">tokens</span> <span class="comment">4096</span> --<span class="comment">optimizer</span> <span class="comment">adam</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>data-bin</code>是上一篇文章”命令行工具“中预处理的数据路径。该命令可以在任何目录下执行，只要通过<code>--user-dir $HOME/codebase/custom</code>参数指定我们的插件代码位置即可。</p>
+<p>从上面的例子可以看出，自定义并使用一个模型插件需要以下几个步骤：<br>    1. 创建一个python module，即包含<code>__init__.py</code>文件的目录（这个例子中为<code>$HOME/codebase/custom</code>）；<br>    2. 定义新的模型类（类名可以任意，只要不和其他重复即可），并用<code>@register_model(&#39;model_name&#39;)</code>装饰器来进行注册（model_name即模型名，Fairseq通过这个名字来定位插件对应的类）；<br>    3. 定义模型对应的预设超参数model_architecture，这是一个函数，接收<code>args</code>参数。比如想将dropout预设为0.1，可以通过<code>args.dropout = 0.1</code>来完成。和模型类似，想要Fairseq能够将其识别为预设超参数，需要使用<code>@register_model_architecture(&#39;model_name&#39;, &#39;arch_name&#39;)</code>来进行注册，其中<code>model_name</code>是模型名，<code>arch_name</code>是预设值的名字；<br>    4. 如果插件的实现在<code>__init__.py</code>之外的文件中，那么还需要在<code>__init__.py</code>文件中导入注册的model和model_architecture，这是因为fairseq在运行时通过查找已经导入（加载）的插件名（如模型名）来定位具体的实现，如果不进行导入，那么即便指定了<code>--user-dir</code>，fairseq也只能加载在<code>__init__.py</code>中的代码，而找不到在其他文件中定义的插件。在这个例子中，由于model和model_architecture都定义在了<code>__init__.py</code>文件中，因此不需要额外的导入；<br>    5. 在命令行调用的时候，指定<code>--user-dir</code>参数为插件路径，并使用<code>--arch</code>来告诉Fairseq使用我们自定义的模型和超参数。</p>
+<p>定义新的任务、优化器等，和定义新的模型基本一致，都是通过定义一个新的类，并通过<code>@register_*</code>来注册。下面，我们将实现一个双向翻译、参数共享的翻译系统，来看一下扩展在实际中如何使用。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>我们使用和系列第一篇《命令行工具》中一致的环境：<br>    1. python 3.7<br>    2. pytorch 1.6.0<br>    3. Fairseq，commit 522c76b<br>    4. cuda 10.1<br>    5. Apex 0.1</p>
+<p>对于数据，我们同样使用iwslt 14英德平行数据来进行训练。由于我们的目的是进行两种语言的双向翻译，编码器和解码器都需要拥有处理两种语言的能力，因此我们需要对两种语言使用共享的词表，在fairseq的预处理命令中，可以通过<code>--joined-dictionary</code>参数来指定：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bash fairseq/examples/translation/prepare-iwslt14.<span class="keyword">sh</span></span><br><span class="line"></span><br><span class="line">fairseq-preprocess --source-lang <span class="keyword">de</span> --target-lang <span class="keyword">en</span> \</span><br><span class="line">    --trainpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/train \</span><br><span class="line">    --validpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/valid \</span><br><span class="line">    --testpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/<span class="keyword">test</span> --joined-dictionary</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，预处理后的二进制数据文件保存在data-bin目录下。</p>
+<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>对于双向翻译任务，我们希望给定一个源语言的句子，模型能解码出一个目标语言的句子；给定一个目标语言的句子，模型能够解码出一个源语言的句子。为了达到这个目的，我们需要模型能够区分出输入是哪种语言，或者说，希望翻译为哪种语言。在多语言机器翻译中，一个简单而有效的做法是，在输入的句子前面加上一个标签来指明希望模型输出的语言，比如在句子前面加一个<code>__2&lt;en&gt;__</code>，来告诉模型我们希望得到英文的翻译结果。</p>
+<p>为了给输入句子加上标签，我们需要在读取数据和组成batch之间进行处理，即读取所有句对，给句对的源端部分加上指明目标语言的标签，再根据句长，将相似长度的句子打包为一个batch，并将这个batch数值化，来构成模型的输入。如前所述，读取数据组成batch的操作需要在Task中进行，因此我们需要自定义一个Task，来对数据进行处理。</p>
+<p>在模型部分，我们希望编码器和解码器共享自注意力和前馈神经网络中的参数，即Transformer中self attention和feed forward模块的参数。这一部分的改变在模型中体现，因此我们还需要自定义一个基于Transformer的Model，以实现参数的共享。</p>
+<p>在明确了目标之后，我们首先需要创建代码库，保存在<code>codebase/custom</code>目录下：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">└── custom</span><br><span class="line">    ├── bidirectional_transformer.<span class="keyword">py</span></span><br><span class="line">    ├── bidirectional_translation_task.<span class="keyword">py</span></span><br><span class="line">    └── __init__.<span class="keyword">py</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span> directory, <span class="number">3</span> <span class="keyword">files</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>bidirectional_transformer.py</code>保存我们自定义的模型，<code>bidirectional_translation_task.py</code>保存我们自定义的任务。为了使Fairseq能够加载自定义模型和任务，需要在<code>__init__.py</code>中将其导入：</p>
+<figure class="highlight capnproto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> (</span><br><span class="line">    bidirectional_transformer <span class="keyword">as</span> _,</span><br><span class="line">    bidirectional_translation_task <span class="keyword">as</span> _,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们的目标就是实现<code>bidirectional_transformer</code>和<code>bidirectional_translation_task</code>了。</p>
+<h2 id="参数共享的模型"><a href="#参数共享的模型" class="headerlink" title="参数共享的模型"></a>参数共享的模型</h2><p>模型部分相对比较简单，由于Fairseq中实现了大量的预设模型，因此我们在实现自定义模型的时候，应该尽量复用已有的代码，通过模型类的继承、方法的重载来实现功能上的修改和扩展。我们直接使用Transformer的实现，并在模型初始化之后，指定参数共享的部分：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">from fairseq.models.transformer import TransformerModel, transformer_iwslt_de_en</span><br><span class="line">from fairseq.models import register_model, register_model_architecture</span><br><span class="line"></span><br><span class="line">@register<span class="constructor">_model(&#x27;<span class="params">bidirectional_transformer</span>&#x27;)</span></span><br><span class="line"><span class="keyword">class</span> <span class="constructor">BidirectionalTransformerModel(TransformerModel)</span>:</span><br><span class="line">    def <span class="constructor">__init__(<span class="params">self</span>, <span class="params">args</span>, <span class="params">encoder</span>, <span class="params">decoder</span>)</span>:</span><br><span class="line">        super<span class="literal">()</span>.<span class="constructor">__init__(<span class="params">args</span>, <span class="params">encoder</span>, <span class="params">decoder</span>)</span></span><br><span class="line">        self.make<span class="constructor">_shared_component()</span></span><br><span class="line">    </span><br><span class="line">    def make<span class="constructor">_shared_component(<span class="params">self</span>)</span>:</span><br><span class="line">        <span class="keyword">for</span> enc_layer, dec_layer <span class="keyword">in</span> zip(self.encoder.layers, self.decoder.layers):</span><br><span class="line">            dec_layer.self_attn.k_proj = enc_layer.self_attn.k_proj</span><br><span class="line">            dec_layer.self_attn.v_proj = enc_layer.self_attn.v_proj</span><br><span class="line">            dec_layer.self_attn.q_proj = enc_layer.self_attn.q_proj</span><br><span class="line">            dec_layer.self_attn.out_proj = enc_layer.self_attn.out_proj</span><br><span class="line">            dec_layer.fc1 = enc_layer.fc1</span><br><span class="line">            dec_layer.fc2 = enc_layer.fc2</span><br><span class="line"></span><br><span class="line">@register<span class="constructor">_model_architecture(&#x27;<span class="params">bidirectional_transformer</span>&#x27;, &#x27;<span class="params">iwslt_arch</span>&#x27;)</span></span><br><span class="line">def iwslt<span class="constructor">_preset_hyperparameters(<span class="params">args</span>)</span>:</span><br><span class="line">    transformer<span class="constructor">_iwslt_de_en(<span class="params">args</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>通过继承Fairseq中的<code>Transformer</code>模型，我们的<code>BidirectionalTransformerModel</code>就可以实现与Transformer相同的功能。在模型的实例化方法<code>__init__</code>中，首先调用父类<code>TransformerModel</code>的初始化方法，来初始化模型及其参数，然后调用<code>make_shared_component</code>方法，来共享编码器和解码器每一层中的<code>self_attn</code>和<code>fc1</code>、<code>fc2</code>参数。同时，我们使用了<code>transformer_iwslt_de_en</code>来定义名为<code>iwslt_arch</code>的预设超参数。最后通过<code>register_model</code>和<code>register_model_architecture</code>来注册模型，就可以在Fairseq中使用了。</p>
+<h2 id="双向翻译任务"><a href="#双向翻译任务" class="headerlink" title="双向翻译任务"></a>双向翻译任务</h2><p>在自定义的双向翻译任务中，我们需要将标签加到每个源端句子前面。由于我们的目的和翻译任务基本一致，因此可以复用Fairseq中的<code>TranslationTask</code>，只需要实现数据加载部分即可。完整代码如下：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">from fairseq.tasks import register_task</span><br><span class="line">from fairseq.tasks.translation import TranslationTask</span><br><span class="line">from fairseq.data import data_utils, PrependTokenDataset, LanguagePairDataset, ConcatDataset</span><br><span class="line"></span><br><span class="line">@register_task(<span class="string">&#x27;bidirectional_translation_task&#x27;</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BidirectionalTranslationTask</span>(<span class="title">TranslationTask</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load_dataset</span><span class="params">(<span class="keyword">self</span>, split, **kwargs)</span></span><span class="symbol">:</span></span><br><span class="line">        shared_dict = <span class="keyword">self</span>.src_dict</span><br><span class="line">        src, tgt = data_utils.infer_language_pair(<span class="keyword">self</span>.args.data)</span><br><span class="line">        prefix = os.path.join(<span class="keyword">self</span>.args.data, <span class="string">&#x27;&#123;&#125;.&#123;&#125;-&#123;&#125;.&#x27;</span>.format(split, src, tgt))</span><br><span class="line"></span><br><span class="line">        src_raw_dataset = data_utils.load_indexed_dataset(prefix + <span class="keyword">self</span>.args.source_lang, shared_dict)</span><br><span class="line">        tgt_raw_dataset = data_utils.load_indexed_dataset(prefix + <span class="keyword">self</span>.args.target_lang, shared_dict)</span><br><span class="line"></span><br><span class="line">        src_prepend_dataset = PrependTokenDataset(src_raw_dataset, shared_dict.index(<span class="string">&#x27;__2&lt;&#123;&#125;&gt;__&#x27;</span>.format(<span class="keyword">self</span>.args.target_lang)))</span><br><span class="line">        tgt_prepend_dataset = PrependTokenDataset(tgt_raw_dataset, shared_dict.index(<span class="string">&#x27;__2&lt;&#123;&#125;&gt;__&#x27;</span>.format(<span class="keyword">self</span>.args.source_lang)))</span><br><span class="line"></span><br><span class="line">        src_dataset = src_prepend_dataset <span class="keyword">if</span> split == <span class="string">&#x27;test&#x27;</span> <span class="keyword">else</span> ConcatDataset([src_prepend_dataset, tgt_prepend_dataset])</span><br><span class="line">        tgt_dataset = tgt_raw_dataset     <span class="keyword">if</span> split == <span class="string">&#x27;test&#x27;</span> <span class="keyword">else</span> ConcatDataset([tgt_raw_dataset,     src_raw_dataset])</span><br><span class="line"></span><br><span class="line">        <span class="keyword">self</span>.datasets[split] = LanguagePairDataset(</span><br><span class="line">            src_dataset, src_dataset.sizes, shared_dict, tgt_dataset, tgt_dataset.sizes, shared_dict)</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setup_task</span><span class="params">(cls, args, **kwargs)</span></span><span class="symbol">:</span></span><br><span class="line">        task = <span class="keyword">super</span>(BidirectionalTranslationTask, cls).setup_task(args)</span><br><span class="line">        <span class="keyword">for</span> lang_token <span class="keyword">in</span> sorted([<span class="string">&#x27;__2&lt;&#123;&#125;&gt;__&#x27;</span>.format(args.source_lang), <span class="string">&#x27;__2&lt;&#123;&#125;&gt;__&#x27;</span>.format(args.target_lang)])<span class="symbol">:</span></span><br><span class="line">            task.src_dict.add_symbol(lang_token)</span><br><span class="line">            task.tgt_dict.add_symbol(lang_token)</span><br><span class="line">        <span class="keyword">return</span> task</span><br></pre></td></tr></table></figure>
+
+<p>参考<code>fairseq/tasks/translation.py</code>的代码可以看到，数据加载实在方法<code>load_dataset</code>中完成的，我们可以在其基础上（加载源语言到目标语言的数据），增加目标语言到源语言数据的加载，并给加载的数据添加标签。<code>load_dataset</code>方法的基本流程是，通过<code>spilt</code>参数，来加载对应的数据，并将加载的数据赋值给<code>self.datasets[split]</code>。其中<code>split</code>参数一般为<code>train</code>、<code>valid</code>或者<code>test</code>。默认情况下，训练、验证、解码分别使用对应的数据，但也可以通过命令行来指定，如<code>fairseq-generate --gen-subset train</code>就会解码训练数据（即split为train）。</p>
+<p>在我们的实现中，读取数据和添加标签的流程如下：<br>    1. 仿照<code>fairseq/tasks/translation.py</code>中的代码，使用<code>data_utils.load_indexed_dataset</code>来分别读取两种语言预处理后的二进制数据；<br>    2. 使用<code>PrependTokenDataset</code>给两种语言的数据都创建一个加标签的版本；<br>    3. 如果是测试的情况下<code>split == &#39;test&#39;</code>，只使用 <code>src_prepend_dataset</code>和<code>tgt_raw_dataset</code>来构建数据集；如果是训练或者验证，则将加标签的源语言和目标语言数据使用<code>ConcatDataset</code>进行拼接，得到<code>src_dataset</code>，将两种语言不加标签的数据拼接，得到<code>tgt_dataset</code>，来构建数据集；<br>    4. 根据<code>src_dataset</code>和<code>tgt_dataset</code>，创建一个<code>LanguagePairDataset</code>，并赋值给<code>self.datasets[split]</code>。</p>
+<p>在这个例子中，我们使用到了<code>PrependTokenDataset</code>、<code>LanguagePairDataset</code>、<code>ConcatDataset</code>三个Fairseq中定义的类来完成加标签、拼接数据等操作。在<code>fairseq/data</code>目录下，还有大量预定义的数据类可供使用，同时，我们还可以继承预定义的类来扩展其功能，完成更复杂的数据处理。</p>
+<p>最后，由于我们使用了额外的标签来指定目标语言，所以需要在词表中添加对应的语言标签。通过查看<code>TranslationTask</code>的代码可知，词表的创建和初始化是在<code>setup_task</code>中进行的，我们通过重写该方法，在任务创建完成后，为<code>src_dict</code>和<code>tgt_dict</code>分别添加源语言标签和目标语言标签。</p>
+<h2 id="训练和解码"><a href="#训练和解码" class="headerlink" title="训练和解码"></a>训练和解码</h2><p>在创建了自定义的任务和模型后，就可以使用该插件来进行训练了。进行训练和解码的命令和前文所介绍的基本一致，只需要指定插件代码的位置<code>--user-dir</code>、模型结构<code>--arch</code>和任务<code>--task</code>：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">fairseq</span><span class="literal">-</span><span class="comment">train</span> <span class="comment">data</span><span class="literal">-</span><span class="comment">bin</span> --<span class="comment">max</span><span class="literal">-</span><span class="comment">tokens</span> <span class="comment">4096</span> --<span class="comment">max</span><span class="literal">-</span><span class="comment">update</span> <span class="comment">50000</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">arch</span> <span class="comment">iwslt_arch</span> --<span class="comment">task</span> <span class="comment">bidirectional_translation_task</span> --<span class="comment">user</span><span class="literal">-</span><span class="comment">dir</span> <span class="comment">$HOME/codebase/custom</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">optimizer</span> <span class="comment">adam</span> --<span class="comment">lr</span><span class="literal">-</span><span class="comment">scheduler</span> <span class="comment">inverse_sqrt</span> --<span class="comment">lr</span> <span class="comment">0</span><span class="string">.</span><span class="comment">0007</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">criterion</span> <span class="comment">label_smoothed_cross_entropy</span> --<span class="comment">label</span><span class="literal">-</span><span class="comment">smoothing</span> <span class="comment">0</span><span class="string">.</span><span class="comment">1</span></span><br></pre></td></tr></table></figure>
+
+<p>解码的命令不需要指定模型结构：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">fairseq</span><span class="literal">-</span><span class="comment">generate</span> <span class="comment">data</span><span class="literal">-</span><span class="comment">bin</span> --<span class="comment">path</span> <span class="comment">checkpoints/checkpoint_best</span><span class="string">.</span><span class="comment">pt</span> --<span class="comment">remove</span><span class="literal">-</span><span class="comment">bpe</span> --<span class="comment">user</span><span class="literal">-</span><span class="comment">dir</span> <span class="comment">$HOME/codebase/custom</span> --<span class="comment">task</span> <span class="comment">bidirectional_translation_task</span> --<span class="comment">source</span><span class="literal">-</span><span class="comment">lang</span> <span class="comment">en</span> --<span class="comment">target</span><span class="literal">-</span><span class="comment">lang</span> <span class="comment">de</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">fairseq</span><span class="literal">-</span><span class="comment">generate</span> <span class="comment">data</span><span class="literal">-</span><span class="comment">bin</span> --<span class="comment">path</span> <span class="comment">checkpoints/checkpoint_best</span><span class="string">.</span><span class="comment">pt</span> --<span class="comment">remove</span><span class="literal">-</span><span class="comment">bpe</span> --<span class="comment">user</span><span class="literal">-</span><span class="comment">dir</span> <span class="comment">$HOME/codebase/custom</span> --<span class="comment">task</span> <span class="comment">bidirectional_translation_task</span> --<span class="comment">source</span><span class="literal">-</span><span class="comment">lang</span> <span class="comment">de</span> --<span class="comment">target</span><span class="literal">-</span><span class="comment">lang</span> <span class="comment">en</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，参数<code>--source-lang</code>和<code>--target-lang</code>可以进行特定方向的翻译，用来验证模型训练得到的双向翻译能力。如果不指定这两个参数，则默认是和数据预处理时相同的翻译方向（德语到英语）。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文通过一个双向翻译的例子，介绍了Fairseq扩展插件的基本使用方法。大多数的NLP任务都可以在不修改源码的情况下，通过编写插件来实现，这在很大程度上简化了实验的流程，我们只需要编写插件实现与原方法、模型不同的部分，而不需要关注重复的模式和训练流程。</p>
+<p>在实际开发插件的过程中，关键的问题在于如何定位我们需要修改的部分，以及如何最大程度地复用Fairseq已经实现的部分。后续文章将介绍Fairseq中已经实现的一些任务、模型，以及数据集等常用的工具，以便了解我们要实现的功能在fairseq中是否已经有对应的实现及实现对应的位置。</p>
+
+  </div>
+  <!--文末结束语-->
+  
+  <div class="mdui-divider"></div>
+  
+  <nav>
+    
+      <a rel="prev" class="post-nav-item mdui-float-left" href="/2020/10/12/fairseq-1/">
+        <i class="iconfont icon-angle-left"></i>
+        <span>Fairseq漫游指南（1）——命令行工具</span>
+      </a>
+    
+    
+  </nav>
+</article>
+
+
+
+
+  <div class="toc-button"  style="z-index: 100;">
+    <button class="mdui-fab mdui-ripple mdui-color-teal" mdui-menu="{target: '#toc'}"><i class="iconfont icon-list"></i></button>
+    <ul class="mdui-menu" id="toc">
+      <li class="mdui-menu-item">
+        <a href="/2020/10/12/fairseq-2/" id="toc-header" class="mdui-ripple">文章目录</a>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Fairseq%E6%89%A9%E5%B1%95%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">Fairseq扩展概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">2.</span> <span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87"><span class="toc-number">3.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E5%85%B1%E4%BA%AB%E7%9A%84%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.</span> <span class="toc-text">参数共享的模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8C%E5%90%91%E7%BF%BB%E8%AF%91%E4%BB%BB%E5%8A%A1"><span class="toc-number">5.</span> <span class="toc-text">双向翻译任务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E5%92%8C%E8%A7%A3%E7%A0%81"><span class="toc-number">6.</span> <span class="toc-text">训练和解码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+      </li>
+    </ul>
+  </div>
+
+
+  </main>
+  <footer id="footer" class="mdui-text-center mdui-m-t-5 mdui-p-b-2 mdui-p-t-4 mdui-color-theme">
+  <div class="mdui-container">
+    <div class="mdui-row">
+      <span>
+        &copy; 2015 - 2020 
+        
+          <span style="color: #d9333f" class="iconfont icon-heart"></span>
+        
+        Qian Wang
+      </span>
+    </div>
+    <div class="mdui-row">
+      
+        <div class="mdui-col-xs-12">
+          <span>Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a></span>
+        </div>
+      
+    </div>
+ </div>
+</footer>
+  
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-ripple mdui-color-teal" style="z-index:100;"><i class="iconfont icon-arrowup"></i></button>
+  
+  
+
+
+
+
+
+
+
+    
+<script src="/js/mdui.min.v1.0.0.js"></script>
+
+
+
+
+<script src="/js/meadow.js"></script>
+
+</body>
+</html >
