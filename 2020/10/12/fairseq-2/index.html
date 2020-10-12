@@ -105,14 +105,6 @@
                 </a>
             
                 
-                <a href="/categories/" class="mdui-list-item mdui-ripple">
-                    <div class="mdui-list-item-icon">
-                        <i class="iconfont icon-folder"></i>
-                    </div>
-                    <div class="mdui-list-item-content">分类</div>
-                </a>
-            
-                
                 <a href="/about/" class="mdui-list-item mdui-ripple">
                     <div class="mdui-list-item-icon">
                         <i class="iconfont icon-user"></i>
@@ -163,14 +155,14 @@
       <span class="iconfont icon-calendar"></span>
       发布于:&nbsp;2020-10-12
     </span>
-    <span>
+    <!-- <span>
       <span class="iconfont icon-calendar-check"></span>
       更新于:&nbsp;2020-10-12
     </span>
     <span>
       <span class="iconfont icon-folder"></span>
       分类于:&nbsp;
-    </span>
+    </span> -->
     
   </div>
 </div>   
@@ -211,11 +203,21 @@
   </header>
   
   
+  <div class="post-tags">
+    
+      <i class="iconfont icon-tag">
+        <a rel="tag" href = /tags/Fairseq/ >Fairseq</a>
+      </i>
+    
+  </div>
+
   
   <div class="mdui-card-content mdui-typo mdui-p-x-4">
     <p>本文为Fairseq漫游指南系列的第二篇文章。前面一篇文章以基于Transformer的翻译模型为例，对Fairseq的命令行使用方法进行了初步的介绍。Fairseq预设了大量的任务和模型，可以根据需要准备数据，并参考对应任务、模型的参数进行训练和解码。</p>
 <p>在实际的使用中，现有的模型可能无法满足真实任务的需要，我们可能需要处理不同类型的输入输出，或者需要对模型进行修改以验证新的想法。在这种情况下，只通过命令行调用预设任务和模型的方法就存在很大的局限，我们需要对Fairseq本身进行扩展，以满足实际多样化的需求。</p>
-<p>本文以实现一个可以双向翻译（EN-DE和DE-EN）的Transformer模型为例，来介绍Fairseq扩展的使用方法。</p>
+<p>本文以实现一个可以双向翻译（EN-DE和DE-EN）的Transformer模型为例，介绍Fairseq的插件扩展。</p>
+<a id="more"></a>
+
 <h2 id="Fairseq扩展概述"><a href="#Fairseq扩展概述" class="headerlink" title="Fairseq扩展概述"></a>Fairseq扩展概述</h2><p>Fairseq允许用户在不修改源代码的情况下，以插件的形式进行扩展。目前，可以自定义五种插件：<br>    1. 任务（Tasks）：任务定义了我们要完成的整个流程，包括读取数据组成batch、模型初始化、训练、测试等。<br>    2. 模型（Models）：模型定义了网络的结构、包含的参数、前向计算过程。<br>    3. 评价准则（Criterions）：评价准则也就是损失函数，用来根据网络输出和真实标签计算损失。<br>    4. 优化器（Optimizers）：在反向传播之后，优化器决定了更新模型参数的方式。<br>    5. 学习率调度器（Learning Rate Schedulers）：学习率调度器可以用来根据训练过的步数，动态调整学习率。</p>
 <p>对于这五种插件，Fairseq自身的代码中提供了大量的预设，可以在对应的目录下查看，如<code>fairseq/models</code>目录下提供了多种模型的实现。在指定了这五种插件（可以为预设值，也可以为用户编写的插件）之后，fairseq的训练流程可以抽象为：</p>
 <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> range(num_epochs):</span><br><span class="line">    itr = task.get<span class="constructor">_batch_iterator(<span class="params">task</span>.<span class="params">dataset</span>(&#x27;<span class="params">train</span>&#x27;)</span>)</span><br><span class="line">    <span class="keyword">for</span> num_updates, batch <span class="keyword">in</span> enumerate(itr):</span><br><span class="line">        task.train<span class="constructor">_step(<span class="params">batch</span>, <span class="params">model</span>, <span class="params">criterion</span>, <span class="params">optimizer</span>)</span></span><br><span class="line">        average<span class="constructor">_and_clip_gradients()</span></span><br><span class="line">        optimizer.step<span class="literal">()</span></span><br><span class="line">        lr_scheduler.step<span class="constructor">_update(<span class="params">num_updates</span>)</span></span><br><span class="line">    lr_scheduler.step(epoch)</span><br></pre></td></tr></table></figure>

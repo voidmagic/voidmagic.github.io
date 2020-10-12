@@ -161,14 +161,6 @@
                 </a>
             
                 
-                <a href="/categories/" class="mdui-list-item mdui-ripple">
-                    <div class="mdui-list-item-icon">
-                        <i class="iconfont icon-folder"></i>
-                    </div>
-                    <div class="mdui-list-item-content">分类</div>
-                </a>
-            
-                
                 <a href="/about/" class="mdui-list-item mdui-ripple">
                     <div class="mdui-list-item-icon">
                         <i class="iconfont icon-user"></i>
@@ -219,14 +211,14 @@
       <span class="iconfont icon-calendar"></span>
       发布于:&nbsp;2020-10-12
     </span>
-    <span>
+    <!-- <span>
       <span class="iconfont icon-calendar-check"></span>
       更新于:&nbsp;2020-10-12
     </span>
     <span>
       <span class="iconfont icon-folder"></span>
       分类于:&nbsp;
-    </span>
+    </span> -->
     
   </div>
 </div>   
@@ -236,14 +228,21 @@
 
       
       
-  <div class="tag-line-space"></div>
+  <div class="post-tags">
+    
+      <i class="iconfont icon-tag">
+        <a rel="tag" href = /tags/Fairseq/ >Fairseq</a>
+      </i>
+    
+  </div>
 
       
       <div id="achieve-abstract" class="mdui-card-content mdui-p-x-4">
         <div class="post-abstract mdui-typo ">
           
             <p>2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua/Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。</p>
-<p>作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻译、自动摘要、语音识别等文本生成任务，或者BERT、GPT等语言模型的训练；同时fairseq还实现了目前常用的多数模型，如RNN、CNN、Transformer、RoBER...
+<p>作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻译、自动摘要、语音识别等文本生成任务，或者BERT、GPT等语言模型的训练；同时fairseq还实现了目前常用的多数模型，如RNN、CNN、Transformer、RoBERTa、XLM等。除了大量内置的任务和模型，fairseq还提供了极为简洁的接口，以便于使用者扩展已有模型、验证新的想法。</p>
+<p>本文将以训练Transformer-based机器翻译模型为例，介绍fairseq的基本使用方法。</p>
           
         </div>
         
@@ -263,14 +262,14 @@
       <span class="iconfont icon-calendar"></span>
       发布于:&nbsp;2020-10-12
     </span>
-    <span>
+    <!-- <span>
       <span class="iconfont icon-calendar-check"></span>
       更新于:&nbsp;2020-10-12
     </span>
     <span>
       <span class="iconfont icon-folder"></span>
       分类于:&nbsp;
-    </span>
+    </span> -->
     
   </div>
 </div>   
@@ -280,7 +279,13 @@
 
       
       
-  <div class="tag-line-space"></div>
+  <div class="post-tags">
+    
+      <i class="iconfont icon-tag">
+        <a rel="tag" href = /tags/Fairseq/ >Fairseq</a>
+      </i>
+    
+  </div>
 
       
       <div id="achieve-abstract" class="mdui-card-content mdui-p-x-4">
@@ -288,7 +293,7 @@
           
             <p>本文为Fairseq漫游指南系列的第二篇文章。前面一篇文章以基于Transformer的翻译模型为例，对Fairseq的命令行使用方法进行了初步的介绍。Fairseq预设了大量的任务和模型，可以根据需要准备数据，并参考对应任务、模型的参数进行训练和解码。</p>
 <p>在实际的使用中，现有的模型可能无法满足真实任务的需要，我们可能需要处理不同类型的输入输出，或者需要对模型进行修改以验证新的想法。在这种情况下，只通过命令行调用预设任务和模型的方法就存在很大的局限，我们需要对Fairseq本身进行扩展，以满足实际多样化的需求。</p>
-<p>本文以实现一个可以双向翻译（EN-DE和DE...
+<p>本文以实现一个可以双向翻译（EN-DE和DE-EN）的Transformer模型为例，介绍Fairseq的插件扩展。</p>
           
         </div>
         

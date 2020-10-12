@@ -105,14 +105,6 @@
                 </a>
             
                 
-                <a href="/categories/" class="mdui-list-item mdui-ripple">
-                    <div class="mdui-list-item-icon">
-                        <i class="iconfont icon-folder"></i>
-                    </div>
-                    <div class="mdui-list-item-content">分类</div>
-                </a>
-            
-                
                 <a href="/about/" class="mdui-list-item mdui-ripple">
                     <div class="mdui-list-item-icon">
                         <i class="iconfont icon-user"></i>
@@ -163,14 +155,14 @@
       <span class="iconfont icon-calendar"></span>
       发布于:&nbsp;2020-10-12
     </span>
-    <span>
+    <!-- <span>
       <span class="iconfont icon-calendar-check"></span>
       更新于:&nbsp;2020-10-12
     </span>
     <span>
       <span class="iconfont icon-folder"></span>
       分类于:&nbsp;
-    </span>
+    </span> -->
     
   </div>
 </div>   
@@ -211,12 +203,21 @@
   </header>
   
   
+  <div class="post-tags">
+    
+      <i class="iconfont icon-tag">
+        <a rel="tag" href = /tags/Fairseq/ >Fairseq</a>
+      </i>
+    
+  </div>
+
   
   <div class="mdui-card-content mdui-typo mdui-p-x-4">
     <p>2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua/Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。</p>
 <p>作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻译、自动摘要、语音识别等文本生成任务，或者BERT、GPT等语言模型的训练；同时fairseq还实现了目前常用的多数模型，如RNN、CNN、Transformer、RoBERTa、XLM等。除了大量内置的任务和模型，fairseq还提供了极为简洁的接口，以便于使用者扩展已有模型、验证新的想法。</p>
 <p>本文将以训练Transformer-based机器翻译模型为例，介绍fairseq的基本使用方法。</p>
-<hr>
+<a id="more"></a>
+
 <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>深度神经网络模型的训练需要GPU支持，因此硬件方面需要安装有NVIDIA GPU的服务器，这里以GTX1080（驱动版本430.64，CUDA版本10.1）的Ubuntu 16.04为例，其他GPU、驱动、操作系统可能有细微差异。为了保证环境的一致性，在环境搭建中将从pytorch的安装开始。</p>
 <ol>
 <li>安装pytorch</li>
