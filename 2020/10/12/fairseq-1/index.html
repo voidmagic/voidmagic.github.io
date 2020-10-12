@@ -5,21 +5,21 @@
   
 
   
-  <title>Fairseq漫游指南（1）——命令行工具 | Hexo</title>
+  <title>Fairseq漫游指南（1）——命令行工具 | Qian Wang</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua&#x2F;Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。 作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Fairseq漫游指南（1）——命令行工具">
 <meta property="og:url" content="http://example.com/2020/10/12/fairseq-1/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Qian Wang">
 <meta property="og:description" content="2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua&#x2F;Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。 作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-10-12T14:45:05.000Z">
-<meta property="article:modified_time" content="2020-10-12T07:04:04.729Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2020-10-12T08:10:24.995Z">
+<meta property="article:author" content="Qian Wang">
 <meta name="twitter:card" content="summary">
   
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="Qian Wang" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -40,7 +40,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
+        <a href="/" id="logo">Qian Wang</a>
       </h1>
       
     </div>
@@ -57,7 +57,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
@@ -97,37 +97,37 @@
 <li>安装pytorch</li>
 </ol>
 <p>使用conda安装pytorch的时候，可以同时指定CUDA版本，意思是安装使用指定CUDA预编译的pytorch：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conda create -n fairseq python&#x3D;3.7</span><br><span class="line">conda install pytorch&#x3D;1.6 torchvision cudatoolkit&#x3D;10.1 -c pytorch -y </span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">conda</span> create -n fairseq python=<span class="number">3</span>.<span class="number">7</span></span><br><span class="line"><span class="attribute">conda</span> install pytorch=<span class="number">1</span>.<span class="number">6</span> torchvision cudatoolkit=<span class="number">10</span>.<span class="number">1</span> -c pytorch -y </span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>安装fairseq</li>
 </ol>
 <p>由于直接使用pip安装的fairseq版本（0.9.0）还停留在2019年12月，为了使用更新的特性，我们选择GitHub上的最新版本（commit 77983ee）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;pytorch&#x2F;fairseq.git</span><br><span class="line">cd fairseq &amp;&amp; git checkout 522c76b &amp;&amp; pip install --editable .&#x2F;</span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/pytorch/</span>fairseq.git</span><br><span class="line">cd fairseq &amp;&amp; git checkout <span class="number">522</span>c76b &amp;&amp; pip install --editable ./</span><br></pre></td></tr></table></figure>
 
 <ol start="3">
 <li>安装apex（可选）</li>
 </ol>
 <p>Apex是NVIDIA为Pytorch开发的混合精度训练库，在多卡训练、半精度训练的过程中可以带来更快的训练效率。安装apex的时候需要注意，由于安装过程会编译CUDA代码，且需要与pytorch使用同一版本的CUDA编译，因此要先安装与pytorch一致的CUDA。下面的命令会下载10.1版本的CUDA，并将其安装在用户目录下（不需要管理员权限），之后用其编译安装apex：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;developer.nvidia.com&#x2F;compute&#x2F;cuda&#x2F;10.1&#x2F;Prod&#x2F;local_installers&#x2F;cuda_10.1.105_418.39_linux.run</span><br><span class="line">mkdir $HOME&#x2F;.cuda &amp;&amp; sh cuda_10.1.105_418.39_linux.run --silent --toolkit --toolkitpath&#x3D;$HOME&#x2F;.cuda --defaultroot&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">export CUDA_HOME&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;NVIDIA&#x2F;apex</span><br><span class="line">cd apex &amp;&amp; pip install -v --no-cache-dir --global-option&#x3D;&quot;--cpp_ext&quot; --global-option&#x3D;&quot;--cuda_ext&quot; .&#x2F;</span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https:<span class="regexp">//</span>developer.nvidia.com<span class="regexp">/compute/</span>cuda<span class="regexp">/10.1/</span>Prod<span class="regexp">/local_installers/</span>cuda_10.<span class="number">1.105</span>_418.<span class="number">39</span>_linux.run</span><br><span class="line">mkdir <span class="variable">$HOME</span><span class="regexp">/.cuda &amp;&amp; sh cuda_10.1.105_418.39_linux.run --silent --toolkit --toolkitpath=$HOME/</span>.cuda --defaultroot=<span class="variable">$HOME</span>/.cuda</span><br><span class="line">export CUDA_HOME=<span class="variable">$HOME</span>/.cuda</span><br><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/NVIDIA/</span>apex</span><br><span class="line">cd apex &amp;&amp; pip install -v --no-cache-dir --global-option=<span class="string">&quot;--cpp_ext&quot;</span> --global-option=<span class="string">&quot;--cuda_ext&quot;</span> ./</span><br></pre></td></tr></table></figure>
 
 
 <ol start="4">
 <li>验证安装</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import torch;print(torch.__version__, torch.version.cuda)&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">python</span> <span class="selector-tag">-c</span> &quot;<span class="selector-tag">import</span> <span class="selector-tag">torch</span>;<span class="selector-tag">print</span>(<span class="selector-tag">torch</span><span class="selector-class">.__version__</span>, <span class="selector-tag">torch</span><span class="selector-class">.version</span><span class="selector-class">.cuda</span>)&quot;</span><br></pre></td></tr></table></figure>
 <p>会显示pytorch版本（1.6.0）和对应cuda版本（10.1）；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.__version__)&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -<span class="keyword">c</span> <span class="string">&quot;import fairseq;print(fairseq.__version__)&quot;</span></span><br></pre></td></tr></table></figure>
 <p>会显示fairseq版本（0.9.0）；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.utils.multi_tensor_l2norm_available)&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">python</span> <span class="selector-tag">-c</span> &quot;<span class="selector-tag">import</span> <span class="selector-tag">fairseq</span>;<span class="selector-tag">print</span>(<span class="selector-tag">fairseq</span><span class="selector-class">.utils</span><span class="selector-class">.multi_tensor_l2norm_available</span>)&quot;</span><br></pre></td></tr></table></figure>
 <p>会显示apex是否成功安装（True）。</p>
 <h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><p>在机器翻译中，需要双语平行数据来进行模型的训练，在这里使用fairseq中提供的数据：<br><code>bash fairseq/examples/translation/prepare-iwslt14.sh</code></p>
 <p>这个脚本会下载IWSLT 14 英语和德语的平行数据，并进行分词、BPE等操作，处理的结果为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">iwslt14.tokenized.de-en</span><br><span class="line">├── code</span><br><span class="line">├── test.de</span><br><span class="line">├── test.en</span><br><span class="line">├── tmp</span><br><span class="line">├── train.de</span><br><span class="line">├── train.en</span><br><span class="line">├── valid.de</span><br><span class="line">└── valid.en</span><br></pre></td></tr></table></figure>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span></span><br><span class="line">├── code</span><br><span class="line">├── <span class="keyword">test</span>.<span class="keyword">de</span></span><br><span class="line">├── <span class="keyword">test</span>.<span class="keyword">en</span></span><br><span class="line">├── tmp</span><br><span class="line">├── train.<span class="keyword">de</span></span><br><span class="line">├── train.<span class="keyword">en</span></span><br><span class="line">├── valid.<span class="keyword">de</span></span><br><span class="line">└── valid.<span class="keyword">en</span></span><br></pre></td></tr></table></figure>
 
 
 <h2 id="数据二进制化"><a href="#数据二进制化" class="headerlink" title="数据二进制化"></a>数据二进制化</h2><p>之后，使用fairseq的预处理命令fairseq-preprocess将文本数据转换为二进制的文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fairseq-preprocess --source-lang de --target-lang en \</span><br><span class="line">    --trainpref iwslt14.tokenized.de-en&#x2F;train \</span><br><span class="line">    --validpref iwslt14.tokenized.de-en&#x2F;valid \</span><br><span class="line">    --testpref iwslt14.tokenized.de-en&#x2F;test</span><br></pre></td></tr></table></figure>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fairseq-preprocess --source-lang <span class="keyword">de</span> --target-lang <span class="keyword">en</span> \</span><br><span class="line">    --trainpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/train \</span><br><span class="line">    --validpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/valid \</span><br><span class="line">    --testpref iwslt14.tokenized.<span class="keyword">de</span>-<span class="keyword">en</span>/<span class="keyword">test</span></span><br></pre></td></tr></table></figure>
 <p>其中，<code>trainpref</code>、<code>validpref</code>和<code>testpref</code>代表两个语言对应文件的前缀（路径和文件名的前缀），<code>source-lang</code>和<code>target-lang</code>两个参数代表两个语言对应文件的后缀名（不代表具体语言，只是通过后缀区分两种语言的数据），fairseq通过这几个参数的组合，来寻找对应的文本数据。</p>
 <p>例如我们的数据中只有训练数据和测试数据，且文件后缀为<code>src</code>和<code>tgt</code>，即<code>train.src</code>、<code>train.tgt</code>、<code>test.src</code>和<code>test.tgt</code>，那么通过指定<code>--source-lang src --target-lang tgt --trainpref train --testpref test</code>，也可以读取的对应的文件。</p>
 <p>预处理命令首先会从训练文本数据中构建词表。在默认情况下，会将所有出现过的单词根据词频排序，并将这个排序后的单词列表作为最终的词表。同时，fairseq还提供了相关的参数来自定义词表：</p>
@@ -138,7 +138,7 @@
 <p>构建的词表是一个单词和序号之间的一对一映射，这个序号是单词在词表中的下标位置。预处理命令在构建词表之后，会将文本数据转换为数值形式，也就是把文本中的每一个词，转换为对应的序号。之后，数值化的文本数据会被进一步编码，默认情况下使用Memory-Mapped IndexedDataset，这种数据编码方式不仅可以压缩文件大小，还可以根据索引进行随机读取，因此在训练的时候不需要加载全部数据，从而节约内存使用。</p>
 <p>二进制化的数据文件会默认保存在data-bin目录下，包括生成的词表、训练数据、验证数据和测试数据。也可以通过–destdir参数，将生成的数据保存在其他目录。</p>
 <h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><p>在对数据进行预处理之后，就可以开始训练翻译模型了。模型训练使用的命令是fairseq-train，在参数中需要指定训练数据、模型、优化器等参数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fairseq-train data-bin --arch transformer_iwslt_de_en \</span><br><span class="line">        --max-tokens 4096 --max-update 30000 \</span><br><span class="line">        --optimizer adam --lr-scheduler inverse_sqrt --lr 0.0007 \</span><br><span class="line">        --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \</span><br><span class="line">        --no-progress-bar --save-interval-updates 1000 </span><br></pre></td></tr></table></figure>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">fairseq</span><span class="literal">-</span><span class="comment">train</span> <span class="comment">data</span><span class="literal">-</span><span class="comment">bin</span> --<span class="comment">arch</span> <span class="comment">transformer_iwslt_de_en</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">max</span><span class="literal">-</span><span class="comment">tokens</span> <span class="comment">4096</span> --<span class="comment">max</span><span class="literal">-</span><span class="comment">update</span> <span class="comment">30000</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">optimizer</span> <span class="comment">adam</span> --<span class="comment">lr</span><span class="literal">-</span><span class="comment">scheduler</span> <span class="comment">inverse_sqrt</span> --<span class="comment">lr</span> <span class="comment">0</span><span class="string">.</span><span class="comment">0007</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">criterion</span> <span class="comment">label_smoothed_cross_entropy</span> --<span class="comment">label</span><span class="literal">-</span><span class="comment">smoothing</span> <span class="comment">0</span><span class="string">.</span><span class="comment">1</span> <span class="comment">\</span></span><br><span class="line"><span class="comment"></span>        --<span class="comment">no</span><span class="literal">-</span><span class="comment">progress</span><span class="literal">-</span><span class="comment">bar</span> --<span class="comment">save</span><span class="literal">-</span><span class="comment">interval</span><span class="literal">-</span><span class="comment">updates</span> <span class="comment">1000</span> </span><br></pre></td></tr></table></figure>
 
 <p>fairseq-train提供了大量的训练参数，从而进行定制化的训练过程，其中主要的参数可以分为数据（data）、模型（model）、优化（optimizing）、训练（分布式和多GPU等）、日志（log）和模型保存（checkpointing）等。</p>
 <ol>
@@ -170,7 +170,7 @@
 <li>fairseq-generate</li>
 </ol>
 <p>fairseq-generate用来解码之前经过预处理（fairseq-preprocess）的数据：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-<span class="keyword">generate</span> data-bin --path checkpoints/checkpoint_best<span class="variable">.pt</span> --remove-bpe</span><br></pre></td></tr></table></figure>
 
 <p>默认情况下，这个命令会从预处理的数据中，解码测试数据（test set）。通过—gen-subset可以指定解码其他部分，如<code>--gen-subset train</code>就会翻译整个训练数据。<br>如果不想得到翻译结果，只想看到翻译结果的BLEU分值，可以通过—quiet参数，只显示翻译进度和最后打分。</p>
 <p>通过<code>--beam</code>、<code>--lenpen</code>和<code>--unkpen</code>，可以分别设置beam search中的beam size，长度惩罚和unk惩罚。</p>
@@ -179,16 +179,16 @@
 <li>fairseq-interactive</li>
 </ol>
 <p>fairseq-interactive可以进行交互式逐句解码，其参数和fairseq-generate基本一致。以下命令用来逐行翻译test.de文件中的句子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat test.de | fairseq-interactive data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">cat</span> test.de | fairseq-interactive <span class="class"><span class="keyword">data</span>-bin <span class="comment">--path checkpoints/checkpoint_best.pt --remove-bpe</span></span></span><br></pre></td></tr></table></figure>
 
 <ol start="3">
 <li>保存翻译结果</li>
 </ol>
 <p>在默认情况下，两种解码方式会将翻译结果直接显示出来，如果想保存翻译结果，可以通过<code>--results-path</code>参数来指定保存结果的位置，或者可以通过重定向的方法将输出保存到文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate someargs &gt; result.txt</span><br></pre></td></tr></table></figure>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-<span class="keyword">generate</span> someargs &gt; result<span class="variable">.txt</span></span><br></pre></td></tr></table></figure>
 
 <p>这两种方法得到的翻译结果文件，包含了解码日志（log）、原文、译文、打分等信息，并且顺序与原文不一致，通过以下命令可以得到排序后的译文：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep ^H result.txt | sort -n -k 2 -t &#39;-&#39; | cut -f 3</span><br></pre></td></tr></table></figure>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grep</span> ^H result.txt | <span class="keyword">sort</span> -n -k <span class="number">2</span> -t <span class="string">&#x27;-&#x27;</span> | cut -f <span class="number">3</span></span><br></pre></td></tr></table></figure>
 
 
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文以训练一个简单翻译模型为例，介绍了fairseq几个命令行工具（fairseq-preprocess、train、generate、interactive）的基本使用方法。通过命令行调用的方法，可以在不接触内部代码的情况下，完成训练解码的整个流程。</p>
@@ -197,7 +197,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/10/12/fairseq-1/" data-id="ckg66xz3500002bsrhujb40m4" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2020/10/12/fairseq-1/" data-id="ckg69bbjy000038th7dyg8ixa" class="article-share-link">Share</a>
       
       
     </footer>
@@ -231,9 +231,9 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a></li></ul>
     </div>
   </div>
 
@@ -241,7 +241,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
         
@@ -265,7 +265,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2020 John Doe<br>
+      &copy; 2020 Qian Wang<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
