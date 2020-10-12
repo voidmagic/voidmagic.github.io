@@ -15,7 +15,7 @@
 <meta property="og:description" content="2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua&#x2F;Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。 作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-10-12T14:45:05.000Z">
-<meta property="article:modified_time" content="2020-10-12T06:56:20.921Z">
+<meta property="article:modified_time" content="2020-10-12T07:02:04.817Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -94,26 +94,33 @@
 <hr>
 <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>深度神经网络模型的训练需要GPU支持，因此硬件方面需要安装有NVIDIA GPU的服务器，这里以GTX1080（驱动版本430.64，CUDA版本10.1）的Ubuntu 16.04为例，其他GPU、驱动、操作系统可能有细微差异。为了保证环境的一致性，在环境搭建中将从pytorch的安装开始。</p>
 <ol>
-<li><p>安装pytorch<br>使用conda安装pytorch的时候，可以同时指定CUDA版本，意思是安装使用指定CUDA预编译的pytorch：</p>
+<li>安装pytorch</li>
+</ol>
+<p>使用conda安装pytorch的时候，可以同时指定CUDA版本，意思是安装使用指定CUDA预编译的pytorch：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conda create -n fairseq python&#x3D;3.7</span><br><span class="line">conda install pytorch&#x3D;1.6 torchvision cudatoolkit&#x3D;10.1 -c pytorch -y </span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装fairseq<br>由于直接使用pip安装的fairseq版本（0.9.0）还停留在2019年12月，为了使用更新的特性，我们选择GitHub上的最新版本（commit 77983ee）：</p>
+
+<ol start="2">
+<li>安装fairseq</li>
+</ol>
+<p>由于直接使用pip安装的fairseq版本（0.9.0）还停留在2019年12月，为了使用更新的特性，我们选择GitHub上的最新版本（commit 77983ee）：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;pytorch&#x2F;fairseq.git</span><br><span class="line">cd fairseq &amp;&amp; git checkout 522c76b &amp;&amp; pip install --editable .&#x2F;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装apex（可选）<br>Apex是NVIDIA为Pytorch开发的混合精度训练库，在多卡训练、半精度训练的过程中可以带来更快的训练效率。安装apex的时候需要注意，由于安装过程会编译CUDA代码，且需要与pytorch使用同一版本的CUDA编译，因此要先安装与pytorch一致的CUDA。下面的命令会下载10.1版本的CUDA，并将其安装在用户目录下（不需要管理员权限），之后用其编译安装apex：</p>
+
+<ol start="3">
+<li>安装apex（可选）</li>
+</ol>
+<p>Apex是NVIDIA为Pytorch开发的混合精度训练库，在多卡训练、半精度训练的过程中可以带来更快的训练效率。安装apex的时候需要注意，由于安装过程会编译CUDA代码，且需要与pytorch使用同一版本的CUDA编译，因此要先安装与pytorch一致的CUDA。下面的命令会下载10.1版本的CUDA，并将其安装在用户目录下（不需要管理员权限），之后用其编译安装apex：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;developer.nvidia.com&#x2F;compute&#x2F;cuda&#x2F;10.1&#x2F;Prod&#x2F;local_installers&#x2F;cuda_10.1.105_418.39_linux.run</span><br><span class="line">mkdir $HOME&#x2F;.cuda &amp;&amp; sh cuda_10.1.105_418.39_linux.run --silent --toolkit --toolkitpath&#x3D;$HOME&#x2F;.cuda --defaultroot&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">export CUDA_HOME&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;NVIDIA&#x2F;apex</span><br><span class="line">cd apex &amp;&amp; pip install -v --no-cache-dir --global-option&#x3D;&quot;--cpp_ext&quot; --global-option&#x3D;&quot;--cuda_ext&quot; .&#x2F;</span><br></pre></td></tr></table></figure>
 
 
-</li>
-</ol>
 <ol start="4">
-<li>验证安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import torch;print(torch.__version__, torch.version.cuda)&quot;</span><br></pre></td></tr></table></figure>
-会显示pytorch版本（1.6.0）和对应cuda版本（10.1）；</li>
+<li>验证安装</li>
 </ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import torch;print(torch.__version__, torch.version.cuda)&quot;</span><br></pre></td></tr></table></figure>
+<p>会显示pytorch版本（1.6.0）和对应cuda版本（10.1）；</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.__version__)&quot;</span><br></pre></td></tr></table></figure>
 <p>会显示fairseq版本（0.9.0）；</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.utils.multi_tensor_l2norm_available)&quot;</span><br></pre></td></tr></table></figure>
-<p>会显示apex是否成功安装（True）。### 1.</p>
+<p>会显示apex是否成功安装（True）。</p>
 <h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><p>在机器翻译中，需要双语平行数据来进行模型的训练，在这里使用fairseq中提供的数据：<br><code>bash fairseq/examples/translation/prepare-iwslt14.sh</code></p>
 <p>这个脚本会下载IWSLT 14 英语和德语的平行数据，并进行分词、BPE等操作，处理的结果为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">iwslt14.tokenized.de-en</span><br><span class="line">├── code</span><br><span class="line">├── test.de</span><br><span class="line">├── test.en</span><br><span class="line">├── tmp</span><br><span class="line">├── train.de</span><br><span class="line">├── train.en</span><br><span class="line">├── valid.de</span><br><span class="line">└── valid.en</span><br></pre></td></tr></table></figure>
@@ -135,42 +142,51 @@
 
 <p>fairseq-train提供了大量的训练参数，从而进行定制化的训练过程，其中主要的参数可以分为数据（data）、模型（model）、优化（optimizing）、训练（分布式和多GPU等）、日志（log）和模型保存（checkpointing）等。</p>
 <ol>
-<li><p>数据部分<br>数据部分的常用参数主要有训练数据的位置（路径），训练时的batch size等。其中，batch size可以通过两种方法指定，<code>--max-tokens</code>是按照词的数量来分的batch，比如<code>--max-tokens 4096</code>指每个batch中包含4096个词；另外还可以通过句子来指定，如<code>--max-sentences 128</code>指每个batch中包含128个句子。</p>
-</li>
-<li><p>模型部分<br>模型部分的参数主要有<code>--arch</code>，用指定所使用的网络模型结构，有大量预设的可以选择。其命名一般为“model_setting”，如“transformer_iwslt_de_en”就是使用Transformer模型和预设的iwslt_de_en超参数。在大数据上进行训练的时候，可以选择“transformer_wmt_en_de”、“transformer_wmt_en_de_big”等设置。除了Transformer之外，还有LSTM、FConv等模型及对应的预设超参数可以选择。</p>
-</li>
+<li>数据部分</li>
 </ol>
+<p>数据部分的常用参数主要有训练数据的位置（路径），训练时的batch size等。其中，batch size可以通过两种方法指定，<code>--max-tokens</code>是按照词的数量来分的batch，比如<code>--max-tokens 4096</code>指每个batch中包含4096个词；另外还可以通过句子来指定，如<code>--max-sentences 128</code>指每个batch中包含128个句子。</p>
+<ol start="2">
+<li>模型部分</li>
+</ol>
+<p>模型部分的参数主要有<code>--arch</code>，用指定所使用的网络模型结构，有大量预设的可以选择。其命名一般为“model_setting”，如“transformer_iwslt_de_en”就是使用Transformer模型和预设的iwslt_de_en超参数。在大数据上进行训练的时候，可以选择“transformer_wmt_en_de”、“transformer_wmt_en_de_big”等设置。除了Transformer之外，还有LSTM、FConv等模型及对应的预设超参数可以选择。</p>
 <p>在使用预设模型的同时，还可以通过额外的命令行参数来覆盖已有的参数，如“transformer_wmt_en_de”中预设的编码器层数是6，可以通过<code>--encoder-layers 12</code>将编码器改为12层。</p>
 <ol start="3">
-<li>优化部分<br>通过<code>--criterion</code>可以指定使用的损失函数，如cross_entropy等。和<code>--arch</code>参数一样，也可以通过命令行参数来覆盖特定损失的默认参数，比如通过<code>--label-smoothing</code>0.1，可以将label_smoothed_cross_entropy损失中默认为0的label-smoothing值改为0.1。</li>
+<li>优化部分</li>
 </ol>
+<p>通过<code>--criterion</code>可以指定使用的损失函数，如cross_entropy等。和<code>--arch</code>参数一样，也可以通过命令行参数来覆盖特定损失的默认参数，比如通过<code>--label-smoothing</code>0.1，可以将label_smoothed_cross_entropy损失中默认为0的label-smoothing值改为0.1。</p>
 <p>通过<code>--optimizer</code>可以指定所使用的优化器，如adam、sgd等；通过<code>--lr-scheduler</code>可以指定学习率缩减的方式。</p>
 <p>通常来说，参数优化紧跟梯度计算，即每计算一次梯度，就会进行一次参数更新。在某些时候，我们希望在多次梯度计算之后进行一次更新，来模拟多GPU训练，可以通过–update-freq来指定，比如在单个GPU上指定“–update-freq 4”来训练，结果和4个GPU训练是基本等价的。</p>
 <ol start="4">
-<li>训练部分<br>Fairseq支持单GPU、多GPU、多机器等多种训练方式，在默认情况下，会根据当前机器的GPU数量来确定训练方式。在绝大多数情况下，这部分参数都不需要关心，而是通过系统环境变量的方式，<code>export CUDA_VISIBLE_DEVICES=0,1</code>,来指定单卡、多卡训练。</li>
+<li>训练部分</li>
 </ol>
+<p>Fairseq支持单GPU、多GPU、多机器等多种训练方式，在默认情况下，会根据当前机器的GPU数量来确定训练方式。在绝大多数情况下，这部分参数都不需要关心，而是通过系统环境变量的方式，<code>export CUDA_VISIBLE_DEVICES=0,1</code>,来指定单卡、多卡训练。</p>
 <p>如果所使用的GPU支持半精度，那么可以通过参数<code>--fp16</code>进行混合精度训练，可以极大提高模型训练的速度。通过<code>torch.cuda.get_device_capability(0)[0]</code>可以确定GPU是否支持半精度，如果该值小于7则不支持，大于等于7则支持。</p>
 <ol start="5">
-<li>日志和模型保存<br>在默认情况下，fairseq使用tqdm和进度条来展示训练过程，但是这种方法不适合长时间在后台进行模型训练。通过<code>--no-progress-bar</code>参数可以改为逐行打印日志，方便保存。默认情况下，每训练100步之后会打印一次，通过<code>--log-interval</code>数可以进行修改。<br>Fairseq在训练过程中会保存中间模型，保存的位置可以通过–save-dir指定，其默认为checkpoints。中间模型保存的频率有两种指定方式，<code>--save-interval</code>指定了每N个epoch（遍历训练数据N次）保存一次；<code>--save-interval-updates</code>指定了每N步保存一次，这种通过step来保存模型的方法目前更为常用。<br>Note：在使用多GPU训练时，指定的batch size（max tokens或max sentences）是单个GPU上的数量，以token计算为例，最终batch size的大小为max-tokens、GPU数量、update-freq的乘积。</li>
+<li>日志和模型保存</li>
 </ol>
+<p>在默认情况下，fairseq使用tqdm和进度条来展示训练过程，但是这种方法不适合长时间在后台进行模型训练。通过<code>--no-progress-bar</code>参数可以改为逐行打印日志，方便保存。默认情况下，每训练100步之后会打印一次，通过<code>--log-interval</code>数可以进行修改。<br>Fairseq在训练过程中会保存中间模型，保存的位置可以通过–save-dir指定，其默认为checkpoints。中间模型保存的频率有两种指定方式，<code>--save-interval</code>指定了每N个epoch（遍历训练数据N次）保存一次；<code>--save-interval-updates</code>指定了每N步保存一次，这种通过step来保存模型的方法目前更为常用。<br>Note：在使用多GPU训练时，指定的batch size（max tokens或max sentences）是单个GPU上的数量，以token计算为例，最终batch size的大小为max-tokens、GPU数量、update-freq的乘积。</p>
 <h2 id="解码"><a href="#解码" class="headerlink" title="解码"></a>解码</h2><p>在经过了充分训练之后，就可以使用模型来进行翻译了。Fairseq提供了两种解码的方式：批生成解码（fairseq-generate）和交互式解码（fairseq-interactive）。</p>
 <ol>
-<li>fairseq-generate<br>fairseq-generate用来解码之前经过预处理（fairseq-preprocess）的数据：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
-
-</li>
+<li>fairseq-generate</li>
 </ol>
+<p>fairseq-generate用来解码之前经过预处理（fairseq-preprocess）的数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
+
 <p>默认情况下，这个命令会从预处理的数据中，解码测试数据（test set）。通过—gen-subset可以指定解码其他部分，如<code>--gen-subset train</code>就会翻译整个训练数据。<br>如果不想得到翻译结果，只想看到翻译结果的BLEU分值，可以通过—quiet参数，只显示翻译进度和最后打分。</p>
 <p>通过<code>--beam</code>、<code>--lenpen</code>和<code>--unkpen</code>，可以分别设置beam search中的beam size，长度惩罚和unk惩罚。</p>
 <p>参数<code>--remove-bpe</code>可以指定对翻译结果的后处理，由于在准备数据的时候，使用了BPE切分，该参数会把BPE切分的词合并为完整的单词。如果不加该参数，则输出的翻译结果和BLEU打分都是按照未合并BPE进行的。如果准备数据时BPE切分使用的是sentencepiece（<a target="_blank" rel="noopener" href="https://github.com/google/sentencepiece%EF%BC%89%EF%BC%8C%E9%82%A3%E4%B9%88%E5%8F%82%E6%95%B0%E7%9A%84%E5%80%BC%E8%BF%98%E5%8F%AF%E4%BB%A5%E8%AE%BE%E4%B8%BA%60--remove-bpe">https://github.com/google/sentencepiece），那么参数的值还可以设为`--remove-bpe</a> sentencepiece`，以合并sentencepiece的切分。</p>
 <ol start="2">
-<li><p>fairseq-interactive<br>fairseq-interactive可以进行交互式逐句解码，其参数和fairseq-generate基本一致。以下命令用来逐行翻译test.de文件中的句子：</p>
+<li>fairseq-interactive</li>
+</ol>
+<p>fairseq-interactive可以进行交互式逐句解码，其参数和fairseq-generate基本一致。以下命令用来逐行翻译test.de文件中的句子：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat test.de | fairseq-interactive data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>保存翻译结果<br>在默认情况下，两种解码方式会将翻译结果直接显示出来，如果想保存翻译结果，可以通过<code>--results-path</code>参数来指定保存结果的位置，或者可以通过重定向的方法将输出保存到文件：</p>
+
+<ol start="3">
+<li>保存翻译结果</li>
+</ol>
+<p>在默认情况下，两种解码方式会将翻译结果直接显示出来，如果想保存翻译结果，可以通过<code>--results-path</code>参数来指定保存结果的位置，或者可以通过重定向的方法将输出保存到文件：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate someargs &gt; result.txt</span><br></pre></td></tr></table></figure>
 
-</li>
-</ol>
 <p>这两种方法得到的翻译结果文件，包含了解码日志（log）、原文、译文、打分等信息，并且顺序与原文不一致，通过以下命令可以得到排序后的译文：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep ^H result.txt | sort -n -k 2 -t &#39;-&#39; | cut -f 3</span><br></pre></td></tr></table></figure>
 
@@ -181,7 +197,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/10/12/fairseq-1/" data-id="ckg66o15i000014ovdtpm0557" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2020/10/12/fairseq-1/" data-id="ckg66vf9b00001lpvglo5c0pi" class="article-share-link">Share</a>
       
       
     </footer>
@@ -191,9 +207,9 @@
 <nav id="article-nav">
   
   
-    <a href="/2020/10/12/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2020/10/12/fairseq-2/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
+      <div class="article-nav-title">Fairseq漫游指南（2）——扩展模型</div>
     </a>
   
 </nav>
@@ -231,6 +247,10 @@
         
           <li>
             <a href="/2020/10/12/fairseq-1/">Fairseq漫游指南（1）——命令行工具</a>
+          </li>
+        
+          <li>
+            <a href="/2020/10/12/fairseq-2/">Fairseq漫游指南（2）——扩展模型</a>
           </li>
         
           <li>

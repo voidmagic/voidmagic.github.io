@@ -5,13 +5,17 @@
   
 
   
-  <title>Hexo</title>
+  <title>Fairseq漫游指南（2）——扩展模型 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="本文为Fairseq漫游指南系列的第二篇文章。前面一篇文章以基于Transformer的翻译模型为例，对Fairseq的命令行使用方法进行了初步的介绍。Fairseq预设了大量的任务和模型，可以根据需要准备数据，并参考对应任务、模型的参数进行训练和解码。 在实际的使用中，现有的模型可能无法满足真实任务的需要，我们可能需要处理不同类型的输入输出，或者需要对模型进行修改以验证新的想法。在这种情况下，只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fairseq漫游指南（2）——扩展模型">
+<meta property="og:url" content="http://example.com/2020/10/12/fairseq-2/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文为Fairseq漫游指南系列的第二篇文章。前面一篇文章以基于Transformer的翻译模型为例，对Fairseq的命令行使用方法进行了初步的介绍。Fairseq预设了大量的任务和模型，可以根据需要准备数据，并参考对应任务、模型的参数进行训练和解码。 在实际的使用中，现有的模型可能无法满足真实任务的需要，我们可能需要处理不同类型的输入输出，或者需要对模型进行修改以验证新的想法。在这种情况下，只">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-10-12T14:45:05.000Z">
+<meta property="article:modified_time" content="2020-10-12T07:02:04.817Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -62,150 +66,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-fairseq-1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/fairseq-1/" class="article-date">
-  <time datetime="2020-10-12T14:45:05.000Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/fairseq-1/">Fairseq漫游指南（1）——命令行工具</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>2017年9月，Facebook AI Research开源了序列建模工具Fairseq。作为对Lua/Torch版本的改进，新款Fairseq基于Python和Pytorch，更加简单易用人性化。经过三年的迭代，fairseq目前已经拥有近两百位contributor，总代码量7万余行，功能和规模都已不同往日。</p>
-<p>作为一个通用的序列建模工具，fairseq可以在多个自然语言处理任务上使用，如机器翻译、自动摘要、语音识别等文本生成任务，或者BERT、GPT等语言模型的训练；同时fairseq还实现了目前常用的多数模型，如RNN、CNN、Transformer、RoBERTa、XLM等。除了大量内置的任务和模型，fairseq还提供了极为简洁的接口，以便于使用者扩展已有模型、验证新的想法。</p>
-<p>本文将以训练Transformer-based机器翻译模型为例，介绍fairseq的基本使用方法。</p>
-<hr>
-<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>深度神经网络模型的训练需要GPU支持，因此硬件方面需要安装有NVIDIA GPU的服务器，这里以GTX1080（驱动版本430.64，CUDA版本10.1）的Ubuntu 16.04为例，其他GPU、驱动、操作系统可能有细微差异。为了保证环境的一致性，在环境搭建中将从pytorch的安装开始。</p>
-<ol>
-<li>安装pytorch</li>
-</ol>
-<p>使用conda安装pytorch的时候，可以同时指定CUDA版本，意思是安装使用指定CUDA预编译的pytorch：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conda create -n fairseq python&#x3D;3.7</span><br><span class="line">conda install pytorch&#x3D;1.6 torchvision cudatoolkit&#x3D;10.1 -c pytorch -y </span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>安装fairseq</li>
-</ol>
-<p>由于直接使用pip安装的fairseq版本（0.9.0）还停留在2019年12月，为了使用更新的特性，我们选择GitHub上的最新版本（commit 77983ee）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;pytorch&#x2F;fairseq.git</span><br><span class="line">cd fairseq &amp;&amp; git checkout 522c76b &amp;&amp; pip install --editable .&#x2F;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>安装apex（可选）</li>
-</ol>
-<p>Apex是NVIDIA为Pytorch开发的混合精度训练库，在多卡训练、半精度训练的过程中可以带来更快的训练效率。安装apex的时候需要注意，由于安装过程会编译CUDA代码，且需要与pytorch使用同一版本的CUDA编译，因此要先安装与pytorch一致的CUDA。下面的命令会下载10.1版本的CUDA，并将其安装在用户目录下（不需要管理员权限），之后用其编译安装apex：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;developer.nvidia.com&#x2F;compute&#x2F;cuda&#x2F;10.1&#x2F;Prod&#x2F;local_installers&#x2F;cuda_10.1.105_418.39_linux.run</span><br><span class="line">mkdir $HOME&#x2F;.cuda &amp;&amp; sh cuda_10.1.105_418.39_linux.run --silent --toolkit --toolkitpath&#x3D;$HOME&#x2F;.cuda --defaultroot&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">export CUDA_HOME&#x3D;$HOME&#x2F;.cuda</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;NVIDIA&#x2F;apex</span><br><span class="line">cd apex &amp;&amp; pip install -v --no-cache-dir --global-option&#x3D;&quot;--cpp_ext&quot; --global-option&#x3D;&quot;--cuda_ext&quot; .&#x2F;</span><br></pre></td></tr></table></figure>
-
-
-<ol start="4">
-<li>验证安装</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import torch;print(torch.__version__, torch.version.cuda)&quot;</span><br></pre></td></tr></table></figure>
-<p>会显示pytorch版本（1.6.0）和对应cuda版本（10.1）；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.__version__)&quot;</span><br></pre></td></tr></table></figure>
-<p>会显示fairseq版本（0.9.0）；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fairseq;print(fairseq.utils.multi_tensor_l2norm_available)&quot;</span><br></pre></td></tr></table></figure>
-<p>会显示apex是否成功安装（True）。</p>
-<h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><p>在机器翻译中，需要双语平行数据来进行模型的训练，在这里使用fairseq中提供的数据：<br><code>bash fairseq/examples/translation/prepare-iwslt14.sh</code></p>
-<p>这个脚本会下载IWSLT 14 英语和德语的平行数据，并进行分词、BPE等操作，处理的结果为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">iwslt14.tokenized.de-en</span><br><span class="line">├── code</span><br><span class="line">├── test.de</span><br><span class="line">├── test.en</span><br><span class="line">├── tmp</span><br><span class="line">├── train.de</span><br><span class="line">├── train.en</span><br><span class="line">├── valid.de</span><br><span class="line">└── valid.en</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="数据二进制化"><a href="#数据二进制化" class="headerlink" title="数据二进制化"></a>数据二进制化</h2><p>之后，使用fairseq的预处理命令fairseq-preprocess将文本数据转换为二进制的文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fairseq-preprocess --source-lang de --target-lang en \</span><br><span class="line">    --trainpref iwslt14.tokenized.de-en&#x2F;train \</span><br><span class="line">    --validpref iwslt14.tokenized.de-en&#x2F;valid \</span><br><span class="line">    --testpref iwslt14.tokenized.de-en&#x2F;test</span><br></pre></td></tr></table></figure>
-<p>其中，<code>trainpref</code>、<code>validpref</code>和<code>testpref</code>代表两个语言对应文件的前缀（路径和文件名的前缀），<code>source-lang</code>和<code>target-lang</code>两个参数代表两个语言对应文件的后缀名（不代表具体语言，只是通过后缀区分两种语言的数据），fairseq通过这几个参数的组合，来寻找对应的文本数据。</p>
-<p>例如我们的数据中只有训练数据和测试数据，且文件后缀为<code>src</code>和<code>tgt</code>，即<code>train.src</code>、<code>train.tgt</code>、<code>test.src</code>和<code>test.tgt</code>，那么通过指定<code>--source-lang src --target-lang tgt --trainpref train --testpref test</code>，也可以读取的对应的文件。</p>
-<p>预处理命令首先会从训练文本数据中构建词表。在默认情况下，会将所有出现过的单词根据词频排序，并将这个排序后的单词列表作为最终的词表。同时，fairseq还提供了相关的参数来自定义词表：</p>
-<p><code>--thresholdsrc/--thresholdtgt</code>，分别对应源端（source）和目标端（target）的词表的最低词频，词频低于这个阈值的单词将不会出现在词表中，而是统一使用一个unknown标签来代替。</p>
-<p><code>--srcdict/--tgtdict</code>，其参数为一个文件名，即使用已有的词表，而不去根据文本数据中单词的词频构建词表。已有的词表文件中，每一行包含一个单词及其词频（这个词频只作为排序和阈值过滤的依据，不代表实际的词频）。</p>
-<p><code>--nwordssrc/--nwordstgt</code>，源端和目标端词表的大小，在对单词根据词频排序后，取前n个词来构建词表，剩余的单词使用一个统一的unknown标签代替。</p>
-<p><code>--joined-dictionary</code>，源端和目标端使用同一个词表，对于相似语言（如英语和西班牙语）来说，有很多的单词是相同的，使用同一个词表可以降低词表和参数的总规模。</p>
-<p>构建的词表是一个单词和序号之间的一对一映射，这个序号是单词在词表中的下标位置。预处理命令在构建词表之后，会将文本数据转换为数值形式，也就是把文本中的每一个词，转换为对应的序号。之后，数值化的文本数据会被进一步编码，默认情况下使用Memory-Mapped IndexedDataset，这种数据编码方式不仅可以压缩文件大小，还可以根据索引进行随机读取，因此在训练的时候不需要加载全部数据，从而节约内存使用。</p>
-<p>二进制化的数据文件会默认保存在data-bin目录下，包括生成的词表、训练数据、验证数据和测试数据。也可以通过–destdir参数，将生成的数据保存在其他目录。</p>
-<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><p>在对数据进行预处理之后，就可以开始训练翻译模型了。模型训练使用的命令是fairseq-train，在参数中需要指定训练数据、模型、优化器等参数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fairseq-train data-bin --arch transformer_iwslt_de_en \</span><br><span class="line">        --max-tokens 4096 --max-update 30000 \</span><br><span class="line">        --optimizer adam --lr-scheduler inverse_sqrt --lr 0.0007 \</span><br><span class="line">        --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \</span><br><span class="line">        --no-progress-bar --save-interval-updates 1000 </span><br></pre></td></tr></table></figure>
-
-<p>fairseq-train提供了大量的训练参数，从而进行定制化的训练过程，其中主要的参数可以分为数据（data）、模型（model）、优化（optimizing）、训练（分布式和多GPU等）、日志（log）和模型保存（checkpointing）等。</p>
-<ol>
-<li>数据部分</li>
-</ol>
-<p>数据部分的常用参数主要有训练数据的位置（路径），训练时的batch size等。其中，batch size可以通过两种方法指定，<code>--max-tokens</code>是按照词的数量来分的batch，比如<code>--max-tokens 4096</code>指每个batch中包含4096个词；另外还可以通过句子来指定，如<code>--max-sentences 128</code>指每个batch中包含128个句子。</p>
-<ol start="2">
-<li>模型部分</li>
-</ol>
-<p>模型部分的参数主要有<code>--arch</code>，用指定所使用的网络模型结构，有大量预设的可以选择。其命名一般为“model_setting”，如“transformer_iwslt_de_en”就是使用Transformer模型和预设的iwslt_de_en超参数。在大数据上进行训练的时候，可以选择“transformer_wmt_en_de”、“transformer_wmt_en_de_big”等设置。除了Transformer之外，还有LSTM、FConv等模型及对应的预设超参数可以选择。</p>
-<p>在使用预设模型的同时，还可以通过额外的命令行参数来覆盖已有的参数，如“transformer_wmt_en_de”中预设的编码器层数是6，可以通过<code>--encoder-layers 12</code>将编码器改为12层。</p>
-<ol start="3">
-<li>优化部分</li>
-</ol>
-<p>通过<code>--criterion</code>可以指定使用的损失函数，如cross_entropy等。和<code>--arch</code>参数一样，也可以通过命令行参数来覆盖特定损失的默认参数，比如通过<code>--label-smoothing</code>0.1，可以将label_smoothed_cross_entropy损失中默认为0的label-smoothing值改为0.1。</p>
-<p>通过<code>--optimizer</code>可以指定所使用的优化器，如adam、sgd等；通过<code>--lr-scheduler</code>可以指定学习率缩减的方式。</p>
-<p>通常来说，参数优化紧跟梯度计算，即每计算一次梯度，就会进行一次参数更新。在某些时候，我们希望在多次梯度计算之后进行一次更新，来模拟多GPU训练，可以通过–update-freq来指定，比如在单个GPU上指定“–update-freq 4”来训练，结果和4个GPU训练是基本等价的。</p>
-<ol start="4">
-<li>训练部分</li>
-</ol>
-<p>Fairseq支持单GPU、多GPU、多机器等多种训练方式，在默认情况下，会根据当前机器的GPU数量来确定训练方式。在绝大多数情况下，这部分参数都不需要关心，而是通过系统环境变量的方式，<code>export CUDA_VISIBLE_DEVICES=0,1</code>,来指定单卡、多卡训练。</p>
-<p>如果所使用的GPU支持半精度，那么可以通过参数<code>--fp16</code>进行混合精度训练，可以极大提高模型训练的速度。通过<code>torch.cuda.get_device_capability(0)[0]</code>可以确定GPU是否支持半精度，如果该值小于7则不支持，大于等于7则支持。</p>
-<ol start="5">
-<li>日志和模型保存</li>
-</ol>
-<p>在默认情况下，fairseq使用tqdm和进度条来展示训练过程，但是这种方法不适合长时间在后台进行模型训练。通过<code>--no-progress-bar</code>参数可以改为逐行打印日志，方便保存。默认情况下，每训练100步之后会打印一次，通过<code>--log-interval</code>数可以进行修改。<br>Fairseq在训练过程中会保存中间模型，保存的位置可以通过–save-dir指定，其默认为checkpoints。中间模型保存的频率有两种指定方式，<code>--save-interval</code>指定了每N个epoch（遍历训练数据N次）保存一次；<code>--save-interval-updates</code>指定了每N步保存一次，这种通过step来保存模型的方法目前更为常用。<br>Note：在使用多GPU训练时，指定的batch size（max tokens或max sentences）是单个GPU上的数量，以token计算为例，最终batch size的大小为max-tokens、GPU数量、update-freq的乘积。</p>
-<h2 id="解码"><a href="#解码" class="headerlink" title="解码"></a>解码</h2><p>在经过了充分训练之后，就可以使用模型来进行翻译了。Fairseq提供了两种解码的方式：批生成解码（fairseq-generate）和交互式解码（fairseq-interactive）。</p>
-<ol>
-<li>fairseq-generate</li>
-</ol>
-<p>fairseq-generate用来解码之前经过预处理（fairseq-preprocess）的数据：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
-
-<p>默认情况下，这个命令会从预处理的数据中，解码测试数据（test set）。通过—gen-subset可以指定解码其他部分，如<code>--gen-subset train</code>就会翻译整个训练数据。<br>如果不想得到翻译结果，只想看到翻译结果的BLEU分值，可以通过—quiet参数，只显示翻译进度和最后打分。</p>
-<p>通过<code>--beam</code>、<code>--lenpen</code>和<code>--unkpen</code>，可以分别设置beam search中的beam size，长度惩罚和unk惩罚。</p>
-<p>参数<code>--remove-bpe</code>可以指定对翻译结果的后处理，由于在准备数据的时候，使用了BPE切分，该参数会把BPE切分的词合并为完整的单词。如果不加该参数，则输出的翻译结果和BLEU打分都是按照未合并BPE进行的。如果准备数据时BPE切分使用的是sentencepiece（<a target="_blank" rel="noopener" href="https://github.com/google/sentencepiece%EF%BC%89%EF%BC%8C%E9%82%A3%E4%B9%88%E5%8F%82%E6%95%B0%E7%9A%84%E5%80%BC%E8%BF%98%E5%8F%AF%E4%BB%A5%E8%AE%BE%E4%B8%BA%60--remove-bpe">https://github.com/google/sentencepiece），那么参数的值还可以设为`--remove-bpe</a> sentencepiece`，以合并sentencepiece的切分。</p>
-<ol start="2">
-<li>fairseq-interactive</li>
-</ol>
-<p>fairseq-interactive可以进行交互式逐句解码，其参数和fairseq-generate基本一致。以下命令用来逐行翻译test.de文件中的句子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat test.de | fairseq-interactive data-bin --path checkpoints&#x2F;checkpoint_best.pt --remove-bpe</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>保存翻译结果</li>
-</ol>
-<p>在默认情况下，两种解码方式会将翻译结果直接显示出来，如果想保存翻译结果，可以通过<code>--results-path</code>参数来指定保存结果的位置，或者可以通过重定向的方法将输出保存到文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fairseq-generate someargs &gt; result.txt</span><br></pre></td></tr></table></figure>
-
-<p>这两种方法得到的翻译结果文件，包含了解码日志（log）、原文、译文、打分等信息，并且顺序与原文不一致，通过以下命令可以得到排序后的译文：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep ^H result.txt | sort -n -k 2 -t &#39;-&#39; | cut -f 3</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文以训练一个简单翻译模型为例，介绍了fairseq几个命令行工具（fairseq-preprocess、train、generate、interactive）的基本使用方法。通过命令行调用的方法，可以在不接触内部代码的情况下，完成训练解码的整个流程。</p>
-<p>在后续的文章中，将会陆续介绍fairseq的扩展方法，比如定义新的任务，实现新的模型等。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2020/10/12/fairseq-1/" data-id="ckg66vf9b00001lpvglo5c0pi" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-fairseq-2" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-fairseq-2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/10/12/fairseq-2/" class="article-date">
   <time datetime="2020-10-12T14:45:05.000Z" itemprop="datePublished">2020-10-12</time>
@@ -218,8 +79,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/fairseq-2/">Fairseq漫游指南（2）——扩展模型</a>
+    <h1 class="article-title" itemprop="name">
+      Fairseq漫游指南（2）——扩展模型
     </h1>
   
 
@@ -295,60 +156,28 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/hello-world/" class="article-date">
-  <time datetime="2020-10-12T07:02:04.817Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <a href="/2020/10/12/fairseq-1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
         
+          Fairseq漫游指南（1）——命令行工具
+        
+      </div>
+    </a>
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/hello-world/">Hello World</a>
-    </h1>
   
+    <a href="/2020/10/12/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2020/10/12/hello-world/" data-id="ckg66vf9g00011lpv889aajcg" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-
 
 </section>
         
